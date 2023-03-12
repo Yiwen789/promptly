@@ -22,9 +22,9 @@ function AskForm() {
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
     const prefixedMessage = `Return a shortest list of information you need to ${request}`;
-    
+
     try {
-      const response = await axios.post( `${API_URL}/ask-params-list`, { prefixedMessage });
+      const response = await axios.post(`${API_URL}/ask-params-list`, { prefixedMessage });
       // Split the response from chatGPT by new line and trim the whitespace.
       // TODO: #2 This is a temporary solution. We should use a better way to parse the response.
       const params = response.data?.answer.trim().split('\n') || [];
