@@ -3,12 +3,13 @@ import Answer from './Answer';
 
 function AskForm() {
   const [submitted, setIsSubmitted] = useState(false);
+  const [question, setQuestion] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsSubmitted(true);
-    setIsSubmitted("User asked a question");
-    console.log("submit button clicked");
+    const formData = new FormData(event.target);
+    setQuestion(formData.get('question'));
   };
 
   return (
@@ -23,7 +24,7 @@ function AskForm() {
         
         <button type="submit">Submit</button>
       </form>
-      {submitted && <Answer/>}
+      {submitted && <Answer question={question}/>}
     </div>
   )
 }

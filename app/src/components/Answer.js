@@ -1,8 +1,8 @@
 import React from 'react';
-function Answer() {
+function Answer({ question  }) {
   return (
     <div>
-      <p>Test answer</p>
+      <p>Test answer to question {question}</p>
     </div>
   )
 }
