@@ -1,7 +1,6 @@
 const express = require('express');
-const cors = require('cors');
 const { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } = require('openai');
-
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
@@ -20,9 +19,8 @@ app.get("/", async(req, res) => {
 })
 
 app.post("/ask", async (req, res) => {
-  console.log(req);
-  const prompt = req.body.prompt;
-  
+  console.log("Ask!")
+  const prompt = req.body.message;
   try {
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
@@ -33,7 +31,10 @@ app.post("/ask", async (req, res) => {
       prompt,
 
     });
-    console.log(response.data.choices[0].text);
+    
+    const answer = response.data.choices[0].text
+    console.log(answer);
+    res.json({ answer });
 
     return res.status(200).json({
       success: true,
@@ -60,5 +61,5 @@ app.post("/ask", async (req, res) => {
 // });
 
 app.listen(3001, () => {
-  console.log('App listening on port 3000!');
+  console.log('App listening on port 3001!');
 });
