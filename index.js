@@ -1,8 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } = require('openai');
 
 const app = express();
+
 app.use(express.json());
+app.use(cors());
 
 require('dotenv').config();
 
@@ -17,8 +20,9 @@ app.get("/", async(req, res) => {
 })
 
 app.post("/ask", async (req, res) => {
+  console.log(req);
   const prompt = req.body.prompt;
-
+  
   try {
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
@@ -55,6 +59,6 @@ app.post("/ask", async (req, res) => {
 //   res.send(message);
 // });
 
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log('App listening on port 3000!');
 });
