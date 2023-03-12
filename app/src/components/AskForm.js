@@ -1,32 +1,32 @@
 import React, { useState } from 'react';
-import Answer from './Answer';
+import axios from 'axios';
+
 
 function AskForm() {
-  const [submitted, setIsSubmitted] = useState(false);
+  const [message, setMessage] = useState('');
   const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setIsSubmitted(true);
-    const formData = new FormData(event.target);
-    setQuestion(formData.get('question'));
-  };
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await axios.post('http://localhost:3001/ask', { message });
+    console.log(response.data)
+    setAnswer(response.data?.answer || '');
+    setQuestion(message);
+    setMessage('');
+  }; 
+  
   return (
     <div>
       <h1>Ask a question</h1>
       <form onSubmit={handleSubmit}>
-        <label>
-          Question:
-          <input type="text" name="question" placeholder="Ask a question" />
-        </label>
-        <br />
-        
-        <button type="submit">Submit</button>
+        <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
+        <button type="submit">Ask</button>
       </form>
-      {submitted && <Answer question={question}/>}
+      {question && <p>You asked: {question}</p>}
+      {answer && <p>{answer}</p>}
     </div>
-  )
+  );
 }
 
 export default AskForm;
