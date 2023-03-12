@@ -9,18 +9,18 @@ app.use(cors());
 require('dotenv').config();
 
 const configuration = new Configuration({
-  apiKey:process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 })
 
 const openaiClient = new OpenAIApi(configuration);
 
-app.get("/", async(req, res) => {
+app.get("/", async (req, res) => {
   console.log("Hello!")
 })
 
-app.post("/ask", async (req, res) => {
-  console.log("Ask!")
-  const prompt = req.body.message;
+app.post("/ask-params-list", async (req, res) => {
+  console.log("Ask params list!")
+  const prompt = req.body.prefixedMessage;
   try {
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
@@ -28,12 +28,12 @@ app.post("/ask", async (req, res) => {
     // trigger OpenAI completion
     const response = await openaiClient.createCompletion({
       model: "text-davinci-003",
+      max_tokens: 500,
       prompt,
-
     });
-    
+
     const answer = response.data.choices[0].text
-    console.log(answer);
+    console.log(answer)
     res.json({ answer });
 
     return res.status(200).json({
