@@ -1,47 +1,56 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
-
+import API_URL from '../services/api';
 
 function AskForm() {
   const [request, setRequest] = useState('');
-  const [paramsList, setParamsList] = useState([]);
+  const [requiredFields, setRequiredFields] = useState([]);
   const [responses, setResponses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const prefixedMessage = `Return a list of information you need to ${request}`;
+    if (!request.trim()) {
+      setError('Please provide a valid request');
+      return;
+    }
+    setIsLoading(true);
+    // Reformat the original request from user to a prefixed message.
+    // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
+    const prefixedMessage = `Return a shortest list of information you need to ${request}`;
+    
     try {
-      if (request == null) {
-        throw new Error("Uh oh, no prompt was provided");
-      }
-      else {
-        setRequest(request);
-        const response = await axios.post('http://localhost:3001/ask-params-list', { prefixedMessage });
-        let params = response.data?.answer.trim().split('\n') || [];
-        if (params.length === 0) {
-          setParamsList([]);
-          setResponses([]);
-          return;
-        }
-        setParamsList(params);
-      }
+      const response = await axios.post( `${API_URL}/ask-params-list`, { prefixedMessage });
+      // Split the response from chatGPT by new line and trim the whitespace.
+      // TODO: #2 This is a temporary solution. We should use a better way to parse the response.
+      const params = response.data?.answer.trim().split('\n') || [];
+      setRequiredFields(params);
+      setResponses(Array(params.length).fill(''));
+      setError('');
     } catch (error) {
-      console.log(error.message);
+      setError('Oops! Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Handle the change of the response input.
   const handleResponseInputChange = (event, index) => {
     const newResponses = [...responses];
     newResponses[index] = event.target.value;
     setResponses(newResponses);
   };
 
-  const renderParamsList = () => {
-    if (paramsList.length > 0) {
+  // Render the required fields and the response input for each field.
+  const renderRequiredFields = () => {
+    if (requiredFields.length > 0) {
       return (
         <div>
-          {paramsList.map((param, index) => {
+          {requiredFields.map((param, index) => {
             return (
               <div key={index}>
                 <h3>{param}</h3>
@@ -69,9 +78,16 @@ function AskForm() {
         <br />
         <button type="submit">Ask</button>
       </form>
-      {renderParamsList()}
+      {/* TODO: #3 Add a button to submit the responses and reformat the prompt. */}
+      {isLoading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {renderRequiredFields()}
     </div>
   );
 }
+
+AskForm.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
+};
 
 export default AskForm;
