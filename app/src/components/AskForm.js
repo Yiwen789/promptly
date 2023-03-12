@@ -3,29 +3,73 @@ import axios from 'axios';
 
 
 function AskForm() {
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [request, setRequest] = useState('');
+  const [paramsList, setParamsList] = useState([]);
+  const [responses, setResponses] = useState([]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await axios.post('http://localhost:3001/ask', { question});
-    console.log(response.data);
-    setAnswer(response.data?.answer || '');
-    setQuestion(question);
-  }; 
-  const handleChange = (e) => {
-    setQuestion(e.target.value);
+    const prefixedMessage = `Return a list of information you need to ${request}`;
+    try {
+      if (request == null) {
+        throw new Error("Uh oh, no prompt was provided");
+      }
+      else {
+        setRequest(request);
+        const response = await axios.post('http://localhost:3001/ask-params-list', { prefixedMessage });
+        let params = response.data?.answer.trim().split('\n') || [];
+        if (params.length === 0) {
+          setParamsList([]);
+          setResponses([]);
+          return;
+        }
+        setParamsList(params);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
-  
+
+  const handleResponseInputChange = (event, index) => {
+    const newResponses = [...responses];
+    newResponses[index] = event.target.value;
+    setResponses(newResponses);
+  };
+
+  const renderParamsList = () => {
+    if (paramsList.length > 0) {
+      return (
+        <div>
+          {paramsList.map((param, index) => {
+            return (
+              <div key={index}>
+                <h3>{param}</h3>
+                <textarea
+                  rows="3"
+                  cols="50"
+                  value={responses[index] || ''}
+                  onChange={(event) => handleResponseInputChange(event, index)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div>
       <h1>Ask a question</h1>
       <form onSubmit={handleSubmit}>
-      <textarea rows="5" value={question} onChange={handleChange} />
-      <br />
-      <button type="submit">Ask</button>
+        <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
+        <br />
+        <button type="submit">Ask</button>
       </form>
-      {answer && <div style={{ border: '1px solid black', padding: '10px', marginTop: '10px' }}> {answer}</div>}
+      {renderParamsList()}
     </div>
   );
 }
