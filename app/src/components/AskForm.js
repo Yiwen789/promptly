@@ -21,7 +21,7 @@ function AskForm() {
     setIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of information you need to ${request}`;
+    const prefixedMessage = `Return a shortest list of question you need to ask for helping me ${request}`;
 
     try {
       const response = await axios.post(`${API_URL}/ask-params-list`, { prefixedMessage });
