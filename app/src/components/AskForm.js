@@ -6,6 +6,7 @@ import API_URL from '../services/api';
 function AskForm() {
   const [request, setRequest] = useState('');
   const [requiredFields, setRequiredFields] = useState([]);
+  const [newField, setNewField] = useState(''); // added new state variable
   const [responses, setResponses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,6 +46,28 @@ function AskForm() {
     setResponses(newResponses);
   };
 
+  // Add a new field to the requiredFields array.
+  const handleAddField = () => {
+    if (newField.trim() !== '') { // only add a new field if the input is not empty
+      setRequiredFields([...requiredFields, newField]);
+      setResponses([...responses, '']);
+      setNewField('');
+    }
+  };
+
+  const handleNewFieldInputChange = (event) => {
+    setNewField(event.target.value); // update the new field input value
+  };
+
+  const handleDeleteField = (index) => {
+    const newFields = [...requiredFields];
+    const newResponses = [...responses];
+    newFields.splice(index, 1);
+    newResponses.splice(index, 1);
+    setRequiredFields(newFields);
+    setResponses(newResponses);
+  };
+
   // Render the required fields and the response input for each field.
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
@@ -60,9 +83,20 @@ function AskForm() {
                   value={responses[index] || ''}
                   onChange={(event) => handleResponseInputChange(event, index)}
                 />
+                <button onClick={() => handleDeleteField(index)}>Delete Field</button>
               </div>
             );
           })}
+          <div key={requiredFields.length}>
+            <h3>Add a new field</h3>
+            <textarea
+              rows="3"
+              cols="50"
+              value={newField}
+              onChange={handleNewFieldInputChange}
+            />
+          </div>
+          <button onClick={handleAddField}>Add Field</button>
         </div>
       );
     } else {
