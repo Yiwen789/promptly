@@ -8,8 +8,10 @@ function AskForm() {
   const [requiredFields, setRequiredFields] = useState([]);
   const [newField, setNewField] = useState(''); // added new state variable
   const [responses, setResponses] = useState([]);
+  const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,16 +68,26 @@ function AskForm() {
     setResponses(newResponses);
   };
 
-  const handleSubmitFields = (event) => {
-    event.preventDefault();
-    console.log("submitting the fields");
-
+  const handleSubmitFields = async(e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setAnswer('');//clear previous answer
     const userInputJson = compileToJson(requiredFields, responses);
 
     const requestMessageJson = Object.assign({"request": request}, userInputJson); 
 
     const prefixedMessage = `Complete this request: ${request}, with these user-defined parameters ${userInputJson}`;
     console.log(prefixedMessage);
+
+    try {
+      const response = await axios.post(`${API_URL}/ask-params-list`, { prefixedMessage });
+      setAnswer(response.data?.answer);
+      console.log(answer);
+    } catch (error) {
+      setError('Oops! Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
     
   }
 
@@ -143,6 +155,7 @@ function AskForm() {
       {isLoading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {renderRequiredFields()}
+      <pre>{answer}</pre>
     </div>
   );
 }

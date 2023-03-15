@@ -46,6 +46,21 @@ app.post("/ask-params-list", async (req, res) => {
   }
 });
 
+// app.post("/ask-question", async (req, res) => {
+//   console.log("Ask the question with user defined params!");
+//   const prompt = req.body.prefixedMessage;
+//   try {
+//     if (prompt == null) {
+//       throw new Error("Uh oh, no prompt was provided");
+//     }
+//     // trigger OpenAI completion
+//     const response = await openaiClient.createCompletion({
+//       model: "text-davinci-003",
+//       max_tokens: 500,
+//       prompt,
+//     });
+// }
+
 // app.get('/', async (req, res) => {
 //   const prompt = 'Hello, OpenAI!';
 //   const completions = await openaiClient.completions.create({
