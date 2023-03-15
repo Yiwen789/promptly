@@ -68,18 +68,23 @@ function AskForm() {
     setResponses(newResponses);
   };
 
+  const handleSubmitFields = (event) => {
+    event.preventDefault();
+    console.log("submitting the fields")
+  }
+
   // Render the required fields and the response input for each field.
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
       return (
         <div>
+        <form onSubmit={handleSubmitFields}>
+          <div>
           {requiredFields.map((param, index) => {
             return (
               <div key={index}>
-                <h3>{param}</h3>
+                <label style={{ display: 'block' }}>{param}</label>
                 <textarea
-                  rows="3"
-                  cols="50"
                   value={responses[index] || ''}
                   onChange={(event) => handleResponseInputChange(event, index)}
                 />
@@ -87,17 +92,23 @@ function AskForm() {
               </div>
             );
           })}
-          <div key={requiredFields.length}>
-            <h3>Add a new field</h3>
-            <textarea
-              rows="3"
-              cols="50"
-              value={newField}
-              onChange={handleNewFieldInputChange}
-            />
+          
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+
+        <div key={requiredFields.length}>
+          <label style={{ display: 'block' }}>Add a new field</label>
+          <textarea
+            rows="3"
+            cols="50"
+            value={newField}
+            onChange={handleNewFieldInputChange}
+          />
           </div>
           <button onClick={handleAddField}>Add Field</button>
         </div>
+        
       );
     } else {
       return null;
@@ -106,10 +117,10 @@ function AskForm() {
 
   return (
     <div>
-      <h1>Ask a question</h1>
       <form onSubmit={handleSubmit}>
-        <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
-        <br />
+        <label style={{ display: 'block'}}>Ask a question</label>
+          <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
+          <br />
         <button type="submit">Ask</button>
       </form>
       {/* TODO: #3 Add a button to submit the responses and reformat the prompt. */}
