@@ -11,8 +11,6 @@ function AskForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!request.trim()) {
@@ -70,7 +68,26 @@ function AskForm() {
 
   const handleSubmitFields = (event) => {
     event.preventDefault();
-    console.log("submitting the fields")
+    console.log("submitting the fields");
+
+    const userInputJson = compileToJson(requiredFields, responses);
+
+    const requestMessageJson = Object.assign({"request": request}, userInputJson); 
+
+    const prefixedMessage = `Complete this request: ${request}, with these user-defined parameters ${userInputJson}`;
+    console.log(prefixedMessage);
+    
+  }
+
+  const compileToJson = (keys, values) => {
+    const obj = {};
+    keys.reduce((acc, key, index) => {
+      // Add the current key-value pair to the object
+      obj[key] = values[index];
+      return acc;
+    }, {});
+
+    return JSON.stringify(obj);
   }
 
   // Render the required fields and the response input for each field.
@@ -92,9 +109,8 @@ function AskForm() {
               </div>
             );
           })}
-          
           </div>
-          <button type="submit">Submit</button>
+          <button type="submit">Submit </button>
         </form>
 
         <div key={requiredFields.length}>
