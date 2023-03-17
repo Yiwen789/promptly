@@ -76,7 +76,7 @@ function AskForm() {
 
     const requestMessageJson = Object.assign({"request": request}, userInputJson); 
 
-    const prefixedMessage = `Complete this request: ${request}, with these user-defined parameters ${userInputJson}`;
+    const prefixedMessage = `Complete this request: ${request}, with these user-defined parameter ${userInputJson}. If the user does not provide answer to the question, come up with a reasonable answer.`;
     console.log(prefixedMessage);
 
     try {
