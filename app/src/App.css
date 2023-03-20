@@ -53,7 +53,25 @@ h1 {
   flex-basis: 33.33%;
   padding: 10px;
   box-sizing: border-box;
-  margin: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  background-color: #f2f2f2;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+.column-header h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
 }
 
 .vertical-line {
@@ -67,7 +85,8 @@ h1 {
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 5px;
-  margin: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
   width: 400px;
   overflow-wrap: break-word;
 }

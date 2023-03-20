@@ -140,7 +140,6 @@ function AskForm() {
                           const updatedCheckedStatus = [...checkedStatus]; // create a copy of the original array
                           updatedCheckedStatus[index] = !updatedCheckedStatus[index];
                           setCheckedStatus(updatedCheckedStatus);
-
                         }
                         }
                       />
@@ -179,17 +178,23 @@ function AskForm() {
   return (
     <div className="container">
       <div className="column">
+        <div className="column-header">
+          <h3>Write your one-sentence request</h3>
+        </div>
         <form onSubmit={handleSubmit}>
-          <label style={{ display: 'block' }}>Ask a question</label>
+          <label style={{ display: 'block' }}></label>
           <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
           <br />
-          <button type="submit">Ask</button>
+          <button type="submit">Save & Submit</button>
         </form>
       </div>
 
       <div className="vertical-line"></div>
 
       <div className="column">
+        <div className="column-header">
+          <h3>Try to answer the following questions</h3>
+        </div>
         {isLoading && <p>Loading...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {renderRequiredFields()}
@@ -197,8 +202,13 @@ function AskForm() {
 
       <div className="vertical-line"></div>
 
-      <div className="answer-section">
-        <div className="answer-text">{answer}</div>
+      <div className="column">
+        <div className="column-header">
+          <h3>Result</h3>
+        </div>
+        <div className="answer-section">
+          <div className="answer-text">{answer}</div>
+        </div>
       </div>
     </div>
   );
