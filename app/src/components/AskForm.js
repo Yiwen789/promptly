@@ -31,12 +31,12 @@ function AskForm() {
     setIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of short questions you need to ask for helping me ${request}`;
+    const prefixedMessage = `Return a shortest list of short unique questions you need to ask for helping me ${request}. Display the questions with numbers.`;
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
       // Split the response from chatGPT by new line and trim the whitespace.
-      // TODO: #2 This is a temporary solution. We should use a better way to parse the response.
+      // TODO: #2 This is a temporary solution. We may need to adjust the parsing method later. 
       const params = response.data?.answer.trim().split('\n') || [];
       setRequiredFields(params);
       setResponses(Array(params.length).fill(''));
@@ -77,17 +77,17 @@ function AskForm() {
     setResponses(newResponses);
   };
 
-  const handleSubmitFields = async(e) => {
+  const handleSubmitFields = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setAnswer('');//clear previous answer
     const userInputJson = compileToJson(requiredFields, responses, checkedStatus);
     console.log(userInputJson);
-    const requestMessageJson = Object.assign({"request": request}, userInputJson); 
+    const requestMessageJson = Object.assign({ "request": request }, userInputJson);
 
     const prefixedMessage = `Complete this request: ${request}, 
-    with these user-defined parameters ${userInputJson}, 
-    if the question does not have answer, come up with a 
+    with these user-defined parameters ${userInputJson}.
+    If the question does not have answer, come up with a
     reasonable answer to it.`;
     console.log(prefixedMessage);
 
@@ -99,7 +99,7 @@ function AskForm() {
     } finally {
       setIsLoading(false);
     }
-    
+
   }
 
   const compileToJson = (keys, values, isRandomArr) => {
@@ -108,7 +108,7 @@ function AskForm() {
       // Add the current key-value pair to the object
       if (isRandomArr[index]) {
         obj[key] = "";
-      }else {
+      } else {
         obj[key] = values[index];
       }
       return acc;
@@ -122,52 +122,52 @@ function AskForm() {
     if (requiredFields.length > 0) {
       return (
         <div>
-        <form onSubmit={handleSubmitFields}>
-          <div>
-          {requiredFields.map((param, index) => {
-            return (
-              <div key={index}>
-                <label style={{ display: 'block' }}>{param}</label>
-                <label>
-                  Generate Random Info:
-                  <input
-                    name="checkbox"
-                    type="checkbox"
-                    checked={checkedStatus[index]}
-                    onChange={() => {
+          <form onSubmit={handleSubmitFields}>
+            <div>
+              {requiredFields.map((param, index) => {
+                return (
+                  <div key={index}>
+                    <label style={{ display: 'block' }}>{param}</label>
+                    <label>
+                      Generate Random Info:
+                      <input
+                        name="checkbox"
+                        type="checkbox"
+                        checked={checkedStatus[index]}
+                        onChange={() => {
                           const updatedCheckedStatus = [...checkedStatus]; // create a copy of the original array
                           updatedCheckedStatus[index] = !updatedCheckedStatus[index];
                           setCheckedStatus(updatedCheckedStatus);
-                                                   
-                        }
-                    }
-                  />
-                </label>
-                <textarea
-                  value={responses[index] || ''}
-                  disabled={checkedStatus[index]}
-                  onChange={(event) => handleResponseInputChange(event, index)}
-                />
-                <button onClick={() => handleDeleteField(index)}>Delete Field</button>
-              </div>
-            );
-          })}
-          </div>
-          <button type="submit">Submit </button>
-        </form>
 
-        <div key={requiredFields.length}>
-          <label style={{ display: 'block' }}>Add a new field</label>
-          <textarea
-            rows="3"
-            cols="50"
-            value={newField}
-            onChange={handleNewFieldInputChange}
-          />
+                        }
+                        }
+                      />
+                    </label>
+                    <textarea
+                      value={responses[index] || ''}
+                      disabled={checkedStatus[index]}
+                      onChange={(event) => handleResponseInputChange(event, index)}
+                    />
+                    <button onClick={() => handleDeleteField(index)}>Delete Field</button>
+                  </div>
+                );
+              })}
+            </div>
+            <button type="submit">Submit </button>
+          </form>
+
+          <div key={requiredFields.length}>
+            <label style={{ display: 'block' }}>Add a new field</label>
+            <textarea
+              rows="3"
+              cols="50"
+              value={newField}
+              onChange={handleNewFieldInputChange}
+            />
           </div>
           <button onClick={handleAddField}>Add Field</button>
         </div>
-        
+
       );
     } else {
       return null;
@@ -175,18 +175,29 @@ function AskForm() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label style={{ display: 'block'}}>Ask a question</label>
+    <div className="container">
+      <div className="column">
+        <form onSubmit={handleSubmit}>
+          <label style={{ display: 'block' }}>Ask a question</label>
           <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
           <br />
-        <button type="submit">Ask</button>
-      </form>
-      {/* TODO: #3 Add a button to submit the responses and reformat the prompt. */}
-      {isLoading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {renderRequiredFields()}
-      <pre>{answer}</pre>
+          <button type="submit">Ask</button>
+        </form>
+      </div>
+
+      <div className="vertical-line"></div>
+
+      <div className="column">
+        {isLoading && <p>Loading...</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {renderRequiredFields()}
+      </div>
+
+      <div className="vertical-line"></div>
+
+      <div className="answer-section">
+        <div className="answer-text">{answer}</div>
+      </div>
     </div>
   );
 }
