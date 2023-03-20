@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
+const FORM_LENGTH = 10;
+const GENERATE_RANDOM_SIGNAL = "You fill out this with imagination"
+
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -11,6 +14,12 @@ function AskForm() {
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const [checkedStatus, setCheckedStatus] = useState(() =>
+    Array.from({ length: FORM_LENGTH }, () => true)
+  );
+  const [checked, setChecked] = useState(true);
+  const [text, setText] = useState("");
 
 
   const handleSubmit = async (e) => {
@@ -72,17 +81,19 @@ function AskForm() {
     e.preventDefault();
     setIsLoading(true);
     setAnswer('');//clear previous answer
-    const userInputJson = compileToJson(requiredFields, responses);
-
+    const userInputJson = compileToJson(requiredFields, responses, checkedStatus);
+    console.log(userInputJson);
     const requestMessageJson = Object.assign({"request": request}, userInputJson); 
 
-    const prefixedMessage = `Complete this request: ${request}, with these user-defined parameters ${userInputJson}`;
+    const prefixedMessage = `Complete this request: ${request}, 
+    with these user-defined parameters ${userInputJson}, 
+    if the question does not have answer, come up with a 
+    reasonable answer to it.`;
     console.log(prefixedMessage);
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
       setAnswer(response.data?.answer);
-      console.log(answer);
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
     } finally {
@@ -91,11 +102,15 @@ function AskForm() {
     
   }
 
-  const compileToJson = (keys, values) => {
+  const compileToJson = (keys, values, isRandomArr) => {
     const obj = {};
     keys.reduce((acc, key, index) => {
       // Add the current key-value pair to the object
-      obj[key] = values[index];
+      if (isRandomArr[index]) {
+        obj[key] = "";
+      }else {
+        obj[key] = values[index];
+      }
       return acc;
     }, {});
 
@@ -113,8 +128,24 @@ function AskForm() {
             return (
               <div key={index}>
                 <label style={{ display: 'block' }}>{param}</label>
+                <label>
+                  Generate Random Info:
+                  <input
+                    name="checkbox"
+                    type="checkbox"
+                    checked={checkedStatus[index]}
+                    onChange={() => {
+                          const updatedCheckedStatus = [...checkedStatus]; // create a copy of the original array
+                          updatedCheckedStatus[index] = !updatedCheckedStatus[index];
+                          setCheckedStatus(updatedCheckedStatus);
+                                                   
+                        }
+                    }
+                  />
+                </label>
                 <textarea
                   value={responses[index] || ''}
+                  disabled={checkedStatus[index]}
                   onChange={(event) => handleResponseInputChange(event, index)}
                 />
                 <button onClick={() => handleDeleteField(index)}>Delete Field</button>
