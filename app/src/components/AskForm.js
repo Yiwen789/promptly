@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
+import { Form, Button } from 'react-bootstrap';
 const FORM_LENGTH = 10;
 const GENERATE_RANDOM_SIGNAL = "You fill out this with imagination"
+
 
 
 function AskForm() {
