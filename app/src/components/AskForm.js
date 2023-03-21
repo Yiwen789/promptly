@@ -18,10 +18,10 @@ function AskForm() {
   const [resIsLoading, setResIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showNewField, setShowNewField] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedFields, setSelectedFields] = useState([]);
   const [checked, setChecked] = useState(true);
   const [text, setText] = useState("");
-
-
   const [checkedStatus, setCheckedStatus] = useState(() =>
     Array.from({ length: FORM_LENGTH }, () => true)
   );
@@ -71,6 +71,32 @@ function AskForm() {
   const handleNewFieldInputChange = (event) => {
     setNewField(event.target.value); // update the new field input value
   };
+  
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCheckboxChange = (index) => {
+    const updatedSelectedFields = [...selectedFields];
+    updatedSelectedFields[index] = !updatedSelectedFields[index];
+    setSelectedFields(updatedSelectedFields);
+  };
+
+  const handleDeleteSelectedFields = () => {
+    const updatedRequiredFields = requiredFields.filter((_, index) => !selectedFields[index]);
+    const updatedCheckedStatus = checkedStatus.filter((_, index) => !selectedFields[index]);
+    const updatedResponses = responses.filter((_, index) => !selectedFields[index]);
+    setSelectedFields([]);
+    setRequiredFields(updatedRequiredFields);
+    setCheckedStatus(updatedCheckedStatus);
+    setResponses(updatedResponses);
+  };
+
+  const handleToggleRandomInfo = (updatedSelectedFields) => {
+      setCheckedStatus(updatedSelectedFields);
+      console.log(checkedStatus);
+  };
+
 
   const handleDeleteField = (index) => {
     const newFields = [...requiredFields];
@@ -124,51 +150,59 @@ function AskForm() {
     if (requiredFields.length > 0) {
       return (
         <div>
-          <form onSubmit={handleSubmitFields}>
+          {isEditing ? (
             <div>
               {requiredFields.map((param, index) => (
                 <div key={index}>
-                  <label >{param}</label>
-                  <div>
+                  <label>
                     <input
-                      name="checkbox"
                       type="checkbox"
-                      checked={checkedStatus[index]}
-                      onChange={() => {
-                        const updatedCheckedStatus = [...checkedStatus];
-                        updatedCheckedStatus[index] = !updatedCheckedStatus[index];
-                        setCheckedStatus(updatedCheckedStatus);
-                      }}
+                      checked={selectedFields[index] || false}
+                      onChange={() => handleCheckboxChange(index)}
                     />
-                    <label>Generate Random Info</label>
-                  </div>
-                  <textarea
-                    value={responses[index] || ''}
-                    disabled={checkedStatus[index]}
-                    onChange={(event) => handleResponseInputChange(event, index)}
-                  />
-                  <button onClick={() => handleDeleteField(index)}>
-                    Delete Question
-                  </button>
+                    {param}
+                  </label>
                 </div>
               ))}
+              <button onClick={() => setIsEditing(false)}>Cancel</button>
+              <button onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
+              <button onClick={handleToggleRandomInfo}>Generate Random Information</button>
+
             </div>
-            <button type="submit">Submit</button>
-          </form>
-          <div>
-            <button onClick={() => setShowNewField(true)}>Add a new question</button>
-            {showNewField && (
+          ) : (
+            <div>
+              <button onClick={handleEditClick}>Edit Questions</button>
+              <form onSubmit={handleSubmitFields}>
+                <div>
+                  {requiredFields.map((param, index) => (
+                    <div key={index}>
+                      <label>{param}</label>
+                      <textarea
+                        value={responses[index] || ''}
+                        disabled={checkedStatus[index]}
+                        onChange={(event) => handleResponseInputChange(event, index)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <button type="submit">Submit</button>
+              </form>
               <div>
-                <textarea
-                  rows="3"
-                  cols="50"
-                  value={newField}
-                  onChange={handleNewFieldInputChange}
-                />
-                <button onClick={handleAddField}>Save & Add</button>
+                <button onClick={() => setShowNewField(true)}>Add a new question</button>
+                {showNewField && (
+                  <div>
+                    <textarea
+                      rows="3"
+                      cols="50"
+                      value={newField}
+                      onChange={handleNewFieldInputChange}
+                    />
+                    <button onClick={handleAddField}>Save & Add</button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       );
     } else {
