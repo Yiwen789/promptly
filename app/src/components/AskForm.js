@@ -14,15 +14,17 @@ function AskForm() {
   const [newField, setNewField] = useState(''); // added new state variable
   const [responses, setResponses] = useState([]);
   const [answer, setAnswer] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [questionsIsLoading, setQuestionsIsLoading] = useState(false);
+  const [resIsLoading, setResIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showNewField, setShowNewField] = useState(false);
+  const [checked, setChecked] = useState(true);
+  const [text, setText] = useState("");
+
 
   const [checkedStatus, setCheckedStatus] = useState(() =>
     Array.from({ length: FORM_LENGTH }, () => true)
   );
-  const [checked, setChecked] = useState(true);
-  const [text, setText] = useState("");
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,10 +32,10 @@ function AskForm() {
       setError('Please provide a valid request');
       return;
     }
-    setIsLoading(true);
+    setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of short unique questions you need to ask for helping me ${request}. Display the questions with numbers.`;
+    const prefixedMessage = `Return a shortest list of short questions you need to ask for helping me ${request}. Display the questions with numbers.`;
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
@@ -46,7 +48,7 @@ function AskForm() {
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
     } finally {
-      setIsLoading(false);
+      setQuestionsIsLoading(false);
     }
   };
 
@@ -81,11 +83,10 @@ function AskForm() {
 
   const handleSubmitFields = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setResIsLoading(true);
     setAnswer('');//clear previous answer
     const userInputJson = compileToJson(requiredFields, responses, checkedStatus);
     console.log(userInputJson);
-    const requestMessageJson = Object.assign({ "request": request }, userInputJson);
 
     const prefixedMessage = `Complete this request: ${request}, 
     with these user-defined parameters ${userInputJson}.
@@ -94,12 +95,12 @@ function AskForm() {
     console.log(prefixedMessage);
 
     try {
-      const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
+      const response = await axios.post(`${API_URL}/ask-res`, { prefixedMessage });
       setAnswer(response.data?.answer);
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
     } finally {
-      setIsLoading(false);
+      setResIsLoading(false);
     }
 
   }
@@ -119,56 +120,56 @@ function AskForm() {
     return JSON.stringify(obj);
   }
 
-  // Render the required fields and the response input for each field.
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
       return (
         <div>
           <form onSubmit={handleSubmitFields}>
             <div>
-              {requiredFields.map((param, index) => {
-                return (
-                  <div key={index}>
-                    <label style={{ display: 'block' }}>{param}</label>
-                    <label>
-                      Generate Random Info:
-                      <input
-                        name="checkbox"
-                        type="checkbox"
-                        checked={checkedStatus[index]}
-                        onChange={() => {
-                          const updatedCheckedStatus = [...checkedStatus]; // create a copy of the original array
-                          updatedCheckedStatus[index] = !updatedCheckedStatus[index];
-                          setCheckedStatus(updatedCheckedStatus);
-                        }
-                        }
-                      />
-                    </label>
-                    <textarea
-                      value={responses[index] || ''}
-                      disabled={checkedStatus[index]}
-                      onChange={(event) => handleResponseInputChange(event, index)}
+              {requiredFields.map((param, index) => (
+                <div key={index}>
+                  <label >{param}</label>
+                  <div>
+                    <input
+                      name="checkbox"
+                      type="checkbox"
+                      checked={checkedStatus[index]}
+                      onChange={() => {
+                        const updatedCheckedStatus = [...checkedStatus];
+                        updatedCheckedStatus[index] = !updatedCheckedStatus[index];
+                        setCheckedStatus(updatedCheckedStatus);
+                      }}
                     />
-                    <button onClick={() => handleDeleteField(index)}>Delete Field</button>
+                    <label>Generate Random Info</label>
                   </div>
-                );
-              })}
+                  <textarea
+                    value={responses[index] || ''}
+                    disabled={checkedStatus[index]}
+                    onChange={(event) => handleResponseInputChange(event, index)}
+                  />
+                  <button onClick={() => handleDeleteField(index)}>
+                    Delete Question
+                  </button>
+                </div>
+              ))}
             </div>
-            <button type="submit">Submit </button>
+            <button type="submit">Submit</button>
           </form>
-
-          <div key={requiredFields.length}>
-            <label style={{ display: 'block' }}>Add a new field</label>
-            <textarea
-              rows="3"
-              cols="50"
-              value={newField}
-              onChange={handleNewFieldInputChange}
-            />
+          <div>
+            <button onClick={() => setShowNewField(true)}>Add a new question</button>
+            {showNewField && (
+              <div>
+                <textarea
+                  rows="3"
+                  cols="50"
+                  value={newField}
+                  onChange={handleNewFieldInputChange}
+                />
+                <button onClick={handleAddField}>Save & Add</button>
+              </div>
+            )}
           </div>
-          <button onClick={handleAddField}>Add Field</button>
         </div>
-
       );
     } else {
       return null;
@@ -195,7 +196,7 @@ function AskForm() {
         <div className="column-header">
           <h3>Try to answer the following questions</h3>
         </div>
-        {isLoading && <p>Loading...</p>}
+        {questionsIsLoading && <p>Loading Questions...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {renderRequiredFields()}
       </div>
@@ -207,6 +208,8 @@ function AskForm() {
           <h3>Result</h3>
         </div>
         <div className="answer-section">
+          {resIsLoading && <p>Loading result...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           <div className="answer-text">{answer}</div>
         </div>
       </div>
