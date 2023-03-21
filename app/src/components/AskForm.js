@@ -2,11 +2,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
-import { Button, Form } from 'react-bootstrap';
 const FORM_LENGTH = 10;
-const GENERATE_RANDOM_SIGNAL = "You fill out this with imagination"
-
-
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -20,8 +16,6 @@ function AskForm() {
   const [showNewField, setShowNewField] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFields, setSelectedFields] = useState([]);
-  const [checked, setChecked] = useState(true);
-  const [text, setText] = useState("");
 
   const [checkedStatus, setCheckedStatus] = useState(() =>
     Array.from({ length: FORM_LENGTH }, () => true)
@@ -95,14 +89,14 @@ function AskForm() {
     setResponses(updatedResponses);
   };
 
-  const handleDeleteField = (index) => {
-    const newFields = [...requiredFields];
-    const newResponses = [...responses];
-    newFields.splice(index, 1);
-    newResponses.splice(index, 1);
-    setRequiredFields(newFields);
-    setResponses(newResponses);
-  };
+  // const handleDeleteField = (index) => {
+  //   const newFields = [...requiredFields];
+  //   const newResponses = [...responses];
+  //   newFields.splice(index, 1);
+  //   newResponses.splice(index, 1);
+  //   setRequiredFields(newFields);
+  //   setResponses(newResponses);
+  // };
 
   const handleSubmitFields = async (e) => {
     e.preventDefault();
@@ -158,26 +152,33 @@ function AskForm() {
                   </label>
                 </div>
               ))}
-              <button className="btn btn-success" onClick={() => setShowNewField(true)}>Add a new question</button>
               <br />
-              {showNewField && (
-                <div className="mt-2">
-                  <textarea
-                    className="form-control mb-2"
-                    cols="50"
-                    value={newField}
-                    onChange={handleNewFieldInputChange}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <button className="btn btn-primary" onClick={handleAddField}>Save & Add</button>
+
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <button className="btn btn-success" onClick={() => setShowNewField(true)}>Add a new question</button>
+                {showNewField && (
+                  <div className="mt-2">
+                    <textarea
+                      className="form-control mb-2"
+                      cols="50"
+                      value={newField}
+                      onChange={handleNewFieldInputChange}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <button className="btn btn-primary" onClick={handleAddField}>Save & Add</button>
+                    </div>
                     <br />
                   </div>
-                </div>
-              )}
-              <div className="d-flex justify-content-center">
-                <button className="btn btn-primary" onClick={() => setIsEditing(false)}> Return</button>
+                )}
+                <br />
+
                 <button className="btn btn-danger ml-2" onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
+                <br />
+                <button className="btn btn-primary" onClick={() => setIsEditing(false)}> Return</button>
+
               </div>
+
+
             </div>
           ) : (
             <div>
@@ -247,7 +248,7 @@ function AskForm() {
           <h3>Result</h3>
         </div>
         <div className="answer-section">
-          {resIsLoading && <p>Loading result...</p>}
+          {resIsLoading && <p>Loading Result...</p>}
           {error && <p style={{ color: 'red' }}>{error}</p>}
           <div className="answer-text">{answer}</div>
         </div>
