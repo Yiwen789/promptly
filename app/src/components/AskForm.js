@@ -118,7 +118,7 @@ function AskForm() {
     if (requiredFields.length > 0) {
       return (
         <div className="d-flex justify-content-center">
-          <div style={{width:'85%'}}>
+          <div style={{alignItems: ' center', width:'85%'}}>
             <form onSubmit={handleSubmitFields}>
               <div>
                 {requiredFields.map((param, index) => (
@@ -135,8 +135,8 @@ function AskForm() {
                       className="form-control"
                       value={responses[index] || ''}
                       onChange={(event) => handleResponseInputChange(event, index)}
-                      style={{width: '80%'}}
-                    />
+                      style={{ marginBottom: '10px', width: '85%' }}
+                      />
                   </div>
                 ))}
               </div>

@@ -56,8 +56,10 @@ h1 {
   border: 1px solid;
 }
 
+
+
 .column {
-  flex-basis: 33.33%;
+  flex-basis: 33.3%;
   padding: 0px;
   box-sizing: border-box;
   margin: 0px;
