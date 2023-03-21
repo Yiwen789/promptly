@@ -118,14 +118,12 @@ function AskForm() {
     if (requiredFields.length > 0) {
       return (
         <div className="d-flex justify-content-center">
-          <div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            </div>
+          <div style={{width:'85%'}}>
             <form onSubmit={handleSubmitFields}>
               <div>
                 {requiredFields.map((param, index) => (
                   <div key={index}>
-                    <div style={{ display: 'flex', alignItems: ' center', flexDirection: 'row' }}>
+                    <div style={{ display: 'flex', alignItems: ' center', flexDirection: 'row'}}>
                       <FontAwesomeIcon
                         icon={faTimesCircle}
                         onClick={() => handleDeleteField(index)}
@@ -137,6 +135,7 @@ function AskForm() {
                       className="form-control"
                       value={responses[index] || ''}
                       onChange={(event) => handleResponseInputChange(event, index)}
+                      style={{width: '80%'}}
                     />
                   </div>
                 ))}
@@ -181,7 +180,7 @@ function AskForm() {
           <h3>Write your one-sentence request</h3>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <form onSubmit={handleSubmit} style={{ width: '80%' }}>
+          <form onSubmit={handleSubmit} style={{ width: '85%' }}>
             <textarea className="form-control" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
             <br />
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -199,9 +198,8 @@ function AskForm() {
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <div class="d-flex justify-content-center my-3">
-          {questionsIsLoading && <div class="spinner-border text-primary"></div>}
+          {questionsIsLoading && <div class="spinner-border spinner-border-md text-primary"></div>}
         </div>
-
         {renderRequiredFields()}
       </div>
 
@@ -227,10 +225,6 @@ function AskForm() {
           </div>
         </div>
       </div>
-
-
-
-
     </div>
   );
 }

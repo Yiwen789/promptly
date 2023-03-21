@@ -38,23 +38,29 @@
   }
 }
 
+
 h1 {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.container {
+.hr .container {
   display: flex;
   flex-direction: row;
   border: 1px solid #ccc;
 }
 
+.hr-style {
+  margin-bottom: 0px;
+  border-color: rgba(49, 47, 47, 0.345);
+  border: 1px solid;
+}
+
 .column {
   flex-basis: 33.33%;
-  padding: 10px;
+  padding: 0px;
   box-sizing: border-box;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin: 0px;
 
 }
 
@@ -66,6 +72,10 @@ h1 {
   background-color: #f2f2f2;
   border-bottom: 1px solid #ccc;
   margin-bottom: 20px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+  /* margin-top: 5px; */
 }
 
 .column-header h3 {
@@ -75,10 +85,8 @@ h1 {
 }
 
 .vertical-line {
-  border-left: 3px solid #bacfdc;
-  padding: 10px;
+  border-left: 2px solid rgba(49, 47, 47, 0.345);
   height: 100vh;
-  margin-left: 10px;
 }
 
 .answer-section {
@@ -86,8 +94,10 @@ h1 {
   padding: 0 20px 20px;
   border-radius: 5px;
   margin: auto;
-  width: 90%;
-  height: max-content;
+  width: 85%;
+  min-height: 300px;
+  max-height: 525px;
+  overflow: auto;
 }
 
 .answer-text {

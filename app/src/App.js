@@ -10,7 +10,9 @@ function App() {
   }, []);
   return (
     <div>
+      <br/>
       <h1>Promptly</h1>
+      <hr className="hr-style"/>
       <AskForm/>
     </div>
   )
