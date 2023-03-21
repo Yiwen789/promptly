@@ -35,7 +35,7 @@ function AskForm() {
     setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of short questions you need to ask for helping me ${request}. Display the questions with numbers.`;
+    const prefixedMessage = `Return a shortest list of 5 short questions you need to ask for helping me ${request}. Display the questions with numbers.`;
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
@@ -71,7 +71,7 @@ function AskForm() {
   const handleNewFieldInputChange = (event) => {
     setNewField(event.target.value); // update the new field input value
   };
-  
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
@@ -92,12 +92,6 @@ function AskForm() {
     setResponses(updatedResponses);
   };
 
-  const handleToggleRandomInfo = (updatedSelectedFields) => {
-      setCheckedStatus(updatedSelectedFields);
-      console.log(checkedStatus);
-  };
-
-
   const handleDeleteField = (index) => {
     const newFields = [...requiredFields];
     const newResponses = [...responses];
@@ -111,10 +105,10 @@ function AskForm() {
     e.preventDefault();
     setResIsLoading(true);
     setAnswer('');//clear previous answer
-    const userInputJson = compileToJson(requiredFields, responses, checkedStatus);
+    const userInputJson = compileToJson(requiredFields, responses);
     console.log(userInputJson);
 
-    const prefixedMessage = `Complete this request: ${request}, 
+    const prefixedMessage = `Complete this request: ${request},
     with these user-defined parameters ${userInputJson}.
     If the question does not have answer, come up with a
     reasonable answer to it.`;
@@ -135,11 +129,7 @@ function AskForm() {
     const obj = {};
     keys.reduce((acc, key, index) => {
       // Add the current key-value pair to the object
-      if (isRandomArr[index]) {
-        obj[key] = "";
-      } else {
-        obj[key] = values[index];
-      }
+      obj[key] = values[index];
       return acc;
     }, {});
 
@@ -164,22 +154,21 @@ function AskForm() {
                   </label>
                 </div>
               ))}
-              <button onClick={() => setIsEditing(false)}>Cancel</button>
+              <button onClick={() => setIsEditing(false)}>Save & Return</button>
               <button onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
-              <button onClick={handleToggleRandomInfo}>Generate Random Information</button>
-
             </div>
           ) : (
             <div>
               <button onClick={handleEditClick}>Edit Questions</button>
               <form onSubmit={handleSubmitFields}>
                 <div>
-                  {requiredFields.map((param, index) => (
+                {requiredFields.map((param, index) => (
                     <div key={index}>
                       <label>{param}</label>
                       <textarea
+                        rows="4"
                         value={responses[index] || ''}
-                        disabled={checkedStatus[index]}
+                        // disabled={checkedStatus[index]}
                         onChange={(event) => handleResponseInputChange(event, index)}
                       />
                     </div>
@@ -217,7 +206,7 @@ function AskForm() {
           <h3>Write your one-sentence request</h3>
         </div>
         <form onSubmit={handleSubmit}>
-          <label style={{ display: 'block' }}></label>
+          {/* <label style={{ display: 'block' }}></label> */}
           <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
           <br />
           <button type="submit">Save & Submit</button>
