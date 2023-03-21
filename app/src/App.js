@@ -2,6 +2,7 @@ import './App.css';
 import React, { useEffect } from 'react';
 import AskForm from './components/AskForm';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 
 function App() {
   useEffect(() => {

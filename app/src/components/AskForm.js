@@ -2,7 +2,8 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
-const FORM_LENGTH = 10;
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -14,12 +15,7 @@ function AskForm() {
   const [resIsLoading, setResIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showNewField, setShowNewField] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedFields, setSelectedFields] = useState([]);
-
-  const [checkedStatus, setCheckedStatus] = useState(() =>
-    Array.from({ length: FORM_LENGTH }, () => true)
-  );
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +26,8 @@ function AskForm() {
     setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of 5 short questions you need to ask for helping me ${request}. Display the questions with numbers.`;
+    const prefixedMessage = `Return a shortest list of 5 short questions  you need to ask for helping me ${request}. 
+    In the output, put a number in front of each question. `;
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
@@ -69,34 +66,15 @@ function AskForm() {
     setNewField(event.target.value); // update the new field input value
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
+  const handleDeleteField = (index) => {
+    const newFields = [...requiredFields];
+    const newResponses = [...responses];
+    newFields.splice(index, 1);
+    newResponses.splice(index, 1);
+    setRequiredFields(newFields);
+    setResponses(newResponses);
   };
 
-  const handleCheckboxChange = (index) => {
-    const updatedSelectedFields = [...selectedFields];
-    updatedSelectedFields[index] = !updatedSelectedFields[index];
-    setSelectedFields(updatedSelectedFields);
-  };
-
-  const handleDeleteSelectedFields = () => {
-    const updatedRequiredFields = requiredFields.filter((_, index) => !selectedFields[index]);
-    const updatedCheckedStatus = checkedStatus.filter((_, index) => !selectedFields[index]);
-    const updatedResponses = responses.filter((_, index) => !selectedFields[index]);
-    setSelectedFields([]);
-    setRequiredFields(updatedRequiredFields);
-    setCheckedStatus(updatedCheckedStatus);
-    setResponses(updatedResponses);
-  };
-
-  // const handleDeleteField = (index) => {
-  //   const newFields = [...requiredFields];
-  //   const newResponses = [...responses];
-  //   newFields.splice(index, 1);
-  //   newResponses.splice(index, 1);
-  //   setRequiredFields(newFields);
-  //   setResponses(newResponses);
-  // };
 
   const handleSubmitFields = async (e) => {
     e.preventDefault();
@@ -105,10 +83,8 @@ function AskForm() {
     const userInputJson = compileToJson(requiredFields, responses);
     console.log(userInputJson);
 
-    const prefixedMessage = `Complete this request: ${request},
-    with these user-defined parameters ${userInputJson}.
-    If the question does not have answer, come up with a
-    reasonable answer to it.`;
+    const prefixedMessage = `${request},
+    with the following information ${userInputJson}.`;
     console.log(prefixedMessage);
 
     try {
@@ -133,28 +109,40 @@ function AskForm() {
     return JSON.stringify(obj);
   }
 
+  function handleCopyClick() {
+    navigator.clipboard.writeText(answer);
+    setCopied(true);
+  }
+
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
       return (
         <div className="d-flex justify-content-center">
-          {isEditing ? (
-            <div>
-              {requiredFields.map((param, index) => (
-                <div key={index} className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={selectedFields[index] || false}
-                    onChange={() => handleCheckboxChange(index)}
-                  />
-                  <label className="form-check-label">
-                    {param}
-                  </label>
-                </div>
-              ))}
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            </div>
+            <form onSubmit={handleSubmitFields}>
+              <div>
+                {requiredFields.map((param, index) => (
+                  <div key={index}>
+                    <div style={{ display: 'flex', alignItems: ' center', flexDirection: 'row' }}>
+                      <FontAwesomeIcon
+                        icon={faTimesCircle}
+                        onClick={() => handleDeleteField(index)}
+                        className="delete-button"
+                      />
+                      <label className="form-label">{param}</label>
+                    </div>
+                    <textarea
+                      className="form-control"
+                      value={responses[index] || ''}
+                      onChange={(event) => handleResponseInputChange(event, index)}
+                    />
+                  </div>
+                ))}
+              </div>
               <br />
-
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
                 <button className="btn btn-success" onClick={() => setShowNewField(true)}>Add a new question</button>
                 {showNewField && (
                   <div className="mt-2">
@@ -170,41 +158,14 @@ function AskForm() {
                     <br />
                   </div>
                 )}
-                <br />
-
-                <button className="btn btn-danger ml-2" onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
-                <br />
-                <button className="btn btn-primary" onClick={() => setIsEditing(false)}> Return</button>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                <button className="btn btn-primary mt-2" type="submit">Submit Answers</button>
 
               </div>
-
-
-            </div>
-          ) : (
-            <div>
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <button className="btn btn-primary mb-2" onClick={handleEditClick}>Edit Questions</button>
-              </div>
-              <form onSubmit={handleSubmitFields}>
-                <div>
-                  {requiredFields.map((param, index) => (
-                    <div key={index}>
-                      <label className="form-label">{param}</label>
-                      <textarea
-                        className="form-control"
-                        value={responses[index] || ''}
-                        onChange={(event) => handleResponseInputChange(event, index)}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <button className="btn btn-primary mt-2" type="submit">Submit Answers</button>
-                </div>
-              </form>
-              <br />
-            </div>
-          )}
+            </form>
+            <br />
+          </div>
         </div>
       );
     } else {
@@ -220,10 +181,10 @@ function AskForm() {
           <h3>Write your one-sentence request</h3>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <form onSubmit={handleSubmit} style={{ width: '80%' }}>
             <textarea className="form-control" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
             <br />
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <button className="btn btn-primary mb-2" type="submit">Send Request</button>
             </div>
           </form>
@@ -236,23 +197,40 @@ function AskForm() {
         <div className="column-header">
           <h3>Answer the following questions</h3>
         </div>
-        {questionsIsLoading && <p>Loading Questions...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div class="d-flex justify-content-center my-3">
+          {questionsIsLoading && <div class="spinner-border text-primary"></div>}
+        </div>
+
         {renderRequiredFields()}
       </div>
 
       <div className="vertical-line"></div>
 
+
       <div className="column">
         <div className="column-header">
           <h3>Result</h3>
         </div>
-        <div className="answer-section">
-          {resIsLoading && <p>Loading Result...</p>}
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <div className="answer-text">{answer}</div>
+        <div class="card-body">
+          <div class="d-flex justify-content-center my-3">
+            {resIsLoading && <div class="spinner-border text-primary"></div>}
+          </div>
+          <div class="answer-section">
+            {error && <p class="text-danger">{error}</p>}
+            <div class="answer-text">
+              {answer || ""}
+            </div>
+          </div>
+          <div class="d-flex justify-content-center my-3">
+            <button class="btn btn-success" onClick={handleCopyClick}>{copied ? 'Copied!' : 'Copy'}</button>
+          </div>
         </div>
       </div>
+
+
+
+
     </div>
   );
 }
