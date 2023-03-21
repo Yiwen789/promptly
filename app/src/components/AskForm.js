@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
-import { Form, Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 const FORM_LENGTH = 10;
 const GENERATE_RANDOM_SIGNAL = "You fill out this with imagination"
 
@@ -22,6 +22,7 @@ function AskForm() {
   const [selectedFields, setSelectedFields] = useState([]);
   const [checked, setChecked] = useState(true);
   const [text, setText] = useState("");
+
   const [checkedStatus, setCheckedStatus] = useState(() =>
     Array.from({ length: FORM_LENGTH }, () => true)
   );
@@ -61,10 +62,12 @@ function AskForm() {
 
   // Add a new field to the requiredFields array.
   const handleAddField = () => {
+
     if (newField.trim() !== '') { // only add a new field if the input is not empty
       setRequiredFields([...requiredFields, newField]);
       setResponses([...responses, '']);
       setNewField('');
+      setShowNewField(false);
     }
   };
 
@@ -139,57 +142,66 @@ function AskForm() {
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
       return (
-        <div>
+        <div className="d-flex justify-content-center">
           {isEditing ? (
             <div>
               {requiredFields.map((param, index) => (
-                <div key={index}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={selectedFields[index] || false}
-                      onChange={() => handleCheckboxChange(index)}
-                    />
+                <div key={index} className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={selectedFields[index] || false}
+                    onChange={() => handleCheckboxChange(index)}
+                  />
+                  <label className="form-check-label">
                     {param}
                   </label>
                 </div>
               ))}
-              <button onClick={() => setIsEditing(false)}>Save & Return</button>
-              <button onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
+              <button className="btn btn-success" onClick={() => setShowNewField(true)}>Add a new question</button>
+              <br />
+              {showNewField && (
+                <div className="mt-2">
+                  <textarea
+                    className="form-control mb-2"
+                    cols="50"
+                    value={newField}
+                    onChange={handleNewFieldInputChange}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button className="btn btn-primary" onClick={handleAddField}>Save & Add</button>
+                    <br />
+                  </div>
+                </div>
+              )}
+              <div className="d-flex justify-content-center">
+                <button className="btn btn-primary" onClick={() => setIsEditing(false)}> Return</button>
+                <button className="btn btn-danger ml-2" onClick={handleDeleteSelectedFields}>Delete Selected Questions</button>
+              </div>
             </div>
           ) : (
             <div>
-              <button onClick={handleEditClick}>Edit Questions</button>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <button className="btn btn-primary mb-2" onClick={handleEditClick}>Edit Questions</button>
+              </div>
               <form onSubmit={handleSubmitFields}>
                 <div>
-                {requiredFields.map((param, index) => (
+                  {requiredFields.map((param, index) => (
                     <div key={index}>
-                      <label>{param}</label>
+                      <label className="form-label">{param}</label>
                       <textarea
-                        rows="4"
+                        className="form-control"
                         value={responses[index] || ''}
-                        // disabled={checkedStatus[index]}
                         onChange={(event) => handleResponseInputChange(event, index)}
                       />
                     </div>
                   ))}
                 </div>
-                <button type="submit">Submit</button>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <button className="btn btn-primary mt-2" type="submit">Submit Answers</button>
+                </div>
               </form>
-              <div>
-                <button onClick={() => setShowNewField(true)}>Add a new question</button>
-                {showNewField && (
-                  <div>
-                    <textarea
-                      rows="3"
-                      cols="50"
-                      value={newField}
-                      onChange={handleNewFieldInputChange}
-                    />
-                    <button onClick={handleAddField}>Save & Add</button>
-                  </div>
-                )}
-              </div>
+              <br />
             </div>
           )}
         </div>
@@ -199,25 +211,29 @@ function AskForm() {
     }
   };
 
+
   return (
-    <div className="container">
+    <div className="d-flex">
       <div className="column">
         <div className="column-header">
           <h3>Write your one-sentence request</h3>
         </div>
-        <form onSubmit={handleSubmit}>
-          {/* <label style={{ display: 'block' }}></label> */}
-          <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
-          <br />
-          <button type="submit">Save & Submit</button>
-        </form>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            <textarea className="form-control" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
+            <br />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button className="btn btn-primary mb-2" type="submit">Send Request</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <div className="vertical-line"></div>
 
       <div className="column">
         <div className="column-header">
-          <h3>Try to answer the following questions</h3>
+          <h3>Answer the following questions</h3>
         </div>
         {questionsIsLoading && <p>Loading Questions...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
