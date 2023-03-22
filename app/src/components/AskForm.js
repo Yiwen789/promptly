@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -9,8 +13,11 @@ function AskForm() {
   const [newField, setNewField] = useState(''); // added new state variable
   const [responses, setResponses] = useState([]);
   const [answer, setAnswer] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [questionsIsLoading, setQuestionsIsLoading] = useState(false);
+  const [resIsLoading, setResIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showNewField, setShowNewField] = useState(false);
+  const [copied, setCopied] = useState(false);
 
 
   const handleSubmit = async (e) => {
@@ -19,15 +26,18 @@ function AskForm() {
       setError('Please provide a valid request');
       return;
     }
-    setIsLoading(true);
+
+    setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
-    const prefixedMessage = `Return a shortest list of short questions you need to ask for helping me ${request}`;
+    const prefixedMessage = `Return a shortest list of 5 short questions  you need to ask for helping me ${request}. 
+    In the output, put a number in front of each question. `;
+
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
       // Split the response from chatGPT by new line and trim the whitespace.
-      // TODO: #2 This is a temporary solution. We should use a better way to parse the response.
+      // TODO: #2 This is a temporary solution. We may need to adjust the parsing method later. 
       const params = response.data?.answer.trim().split('\n') || [];
       setRequiredFields(params);
       setResponses(Array(params.length).fill(''));
@@ -35,7 +45,7 @@ function AskForm() {
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
     } finally {
-      setIsLoading(false);
+      setQuestionsIsLoading(false);
     }
   };
 
@@ -52,6 +62,7 @@ function AskForm() {
       setRequiredFields([...requiredFields, newField]);
       setResponses([...responses, '']);
       setNewField('');
+      setShowNewField(false);
     }
   };
 
@@ -68,30 +79,29 @@ function AskForm() {
     setResponses(newResponses);
   };
 
-  const handleSubmitFields = async(e) => {
+  const handleSubmitFields = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setResIsLoading(true);
     setAnswer('');//clear previous answer
     const userInputJson = compileToJson(requiredFields, responses);
+    console.log(userInputJson);
 
-    const requestMessageJson = Object.assign({"request": request}, userInputJson); 
-
-    const prefixedMessage = `Complete this request: ${request}, with these user-defined parameters ${userInputJson}`;
+    const prefixedMessage = `${request},
+    with the following information ${userInputJson}.`;
     console.log(prefixedMessage);
 
     try {
-      const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
+      const response = await axios.post(`${API_URL}/ask-res`, { prefixedMessage });
       setAnswer(response.data?.answer);
-      console.log(answer);
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
     } finally {
-      setIsLoading(false);
+      setResIsLoading(false);
     }
-    
+
   }
 
-  const compileToJson = (keys, values) => {
+  const compileToJson = (keys, values, isRandomArr) => {
     const obj = {};
     keys.reduce((acc, key, index) => {
       // Add the current key-value pair to the object
@@ -102,41 +112,63 @@ function AskForm() {
     return JSON.stringify(obj);
   }
 
-  // Render the required fields and the response input for each field.
+  function handleCopyClick() {
+    navigator.clipboard.writeText(answer);
+    setCopied(true);
+  }
+
   const renderRequiredFields = () => {
     if (requiredFields.length > 0) {
       return (
-        <div>
-        <form onSubmit={handleSubmitFields}>
-          <div>
-          {requiredFields.map((param, index) => {
-            return (
-              <div key={index}>
-                <label style={{ display: 'block' }}>{param}</label>
-                <textarea
-                  value={responses[index] || ''}
-                  onChange={(event) => handleResponseInputChange(event, index)}
-                />
-                <button onClick={() => handleDeleteField(index)}>Delete Field</button>
+        <div className="d-flex justify-content-center">
+          <div style={{alignItems: ' center', width:'85%'}}>
+            <form onSubmit={handleSubmitFields}>
+              <div>
+                {requiredFields.map((param, index) => (
+                  <div key={index}>
+                    <div style={{ display: 'flex', alignItems: ' center', flexDirection: 'row'}}>
+                      <FontAwesomeIcon
+                        icon={faTimesCircle}
+                        onClick={() => handleDeleteField(index)}
+                        className="delete-button"
+                      />
+                      <label className="form-label">{param}</label>
+                    </div>
+                    <textarea
+                      className="form-control"
+                      value={responses[index] || ''}
+                      onChange={(event) => handleResponseInputChange(event, index)}
+                      style={{ marginBottom: '10px', width: '85%' }}
+                      />
+                  </div>
+                ))}
               </div>
-            );
-          })}
-          </div>
-          <button type="submit">Submit </button>
-        </form>
+              <br />
+              <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                <button className="btn btn-success" onClick={() => setShowNewField(true)}>Add a new question</button>
+                {showNewField && (
+                  <div className="mt-2">
+                    <textarea
+                      className="form-control mb-2"
+                      cols="50"
+                      value={newField}
+                      onChange={handleNewFieldInputChange}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <button className="btn btn-primary" onClick={handleAddField}>Save & Add</button>
+                    </div>
+                    <br />
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                <button className="btn btn-primary mt-2" type="submit">Submit Answers</button>
 
-        <div key={requiredFields.length}>
-          <label style={{ display: 'block' }}>Add a new field</label>
-          <textarea
-            rows="3"
-            cols="50"
-            value={newField}
-            onChange={handleNewFieldInputChange}
-          />
+              </div>
+            </form>
+            <br />
           </div>
-          <button onClick={handleAddField}>Add Field</button>
         </div>
-        
       );
     } else {
       return null;
@@ -144,18 +176,57 @@ function AskForm() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label style={{ display: 'block'}}>Ask a question</label>
-          <textarea rows="5" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
-          <br />
-        <button type="submit">Ask</button>
-      </form>
-      {/* TODO: #3 Add a button to submit the responses and reformat the prompt. */}
-      {isLoading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {renderRequiredFields()}
-      <pre>{answer}</pre>
+    <div className="d-flex">
+      <div className="column">
+        <div className="column-header">
+          <h3>Write your one-sentence request</h3>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <form onSubmit={handleSubmit} style={{ width: '85%' }}>
+            <textarea className="form-control" placeholder="Type your request here starting with a verb" value={request} onChange={e => setRequest(e.target.value)} />
+            <br />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <button className="btn btn-primary mb-2" type="submit">Send Request</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div className="vertical-line"></div>
+
+      <div className="column">
+        <div className="column-header">
+          <h3>Answer the following questions</h3>
+        </div>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div class="d-flex justify-content-center my-3">
+          {questionsIsLoading && <div class="spinner-border spinner-border-md text-primary"></div>}
+        </div>
+        {renderRequiredFields()}
+      </div>
+
+      <div className="vertical-line"></div>
+
+
+      <div className="column">
+        <div className="column-header">
+          <h3>Result</h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-center my-3">
+            {resIsLoading && <div class="spinner-border text-primary"></div>}
+          </div>
+          <div class="answer-section">
+            {error && <p class="text-danger">{error}</p>}
+            <div class="answer-text">
+              {answer || ""}
+            </div>
+          </div>
+          <div class="d-flex justify-content-center my-3">
+            <button class="btn btn-success" onClick={handleCopyClick}>{copied ? 'Copied!' : 'Copy'}</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
