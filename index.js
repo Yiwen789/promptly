@@ -46,7 +46,6 @@ app.post("/ask", async (req, res) => {
   }
 });
 
-
 app.post("/ask-res", async (req, res) => {
   console.log("Ask result!")
   const prompt = req.body.prefixedMessage;

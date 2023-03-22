@@ -23,6 +23,7 @@ function AskForm() {
       setError('Please provide a valid request');
       return;
     }
+
     setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
@@ -74,7 +75,6 @@ function AskForm() {
     setRequiredFields(newFields);
     setResponses(newResponses);
   };
-
 
   const handleSubmitFields = async (e) => {
     e.preventDefault();
@@ -172,12 +172,11 @@ function AskForm() {
     }
   };
 
-
   return (
     <div className="d-flex">
       <div className="column">
         <div className="column-header">
-add .          <h3>Write Request</h3>
+            <h3>Write Request</h3>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <form onSubmit={handleSubmit} style={{ width: '85%' }}>
