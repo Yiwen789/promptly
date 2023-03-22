@@ -1,9 +1,11 @@
+
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -17,17 +19,20 @@ function AskForm() {
   const [showNewField, setShowNewField] = useState(false);
   const [copied, setCopied] = useState(false);
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!request.trim()) {
       setError('Please provide a valid request');
       return;
     }
+
     setQuestionsIsLoading(true);
     // Reformat the original request from user to a prefixed message.
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
     const prefixedMessage = `Return a shortest list of 5 short questions  you need to ask for helping me ${request}. 
     In the output, put a number in front of each question. `;
+
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
@@ -53,7 +58,6 @@ function AskForm() {
 
   // Add a new field to the requiredFields array.
   const handleAddField = () => {
-
     if (newField.trim() !== '') { // only add a new field if the input is not empty
       setRequiredFields([...requiredFields, newField]);
       setResponses([...responses, '']);
@@ -74,7 +78,6 @@ function AskForm() {
     setRequiredFields(newFields);
     setResponses(newResponses);
   };
-
 
   const handleSubmitFields = async (e) => {
     e.preventDefault();
@@ -171,7 +174,6 @@ function AskForm() {
       return null;
     }
   };
-
 
   return (
     <div className="d-flex">
