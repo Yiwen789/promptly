@@ -1,11 +1,9 @@
-
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import API_URL from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
-
 
 function AskForm() {
   const [request, setRequest] = useState('');
@@ -19,7 +17,6 @@ function AskForm() {
   const [showNewField, setShowNewField] = useState(false);
   const [copied, setCopied] = useState(false);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!request.trim()) {
@@ -32,7 +29,6 @@ function AskForm() {
     // TODO: #1 This is a temporary solution. We should use a better way to parse the request.
     const prefixedMessage = `Return a shortest list of 5 short questions  you need to ask for helping me ${request}. 
     In the output, put a number in front of each question. `;
-
 
     try {
       const response = await axios.post(`${API_URL}/ask`, { prefixedMessage });
@@ -58,6 +54,7 @@ function AskForm() {
 
   // Add a new field to the requiredFields array.
   const handleAddField = () => {
+
     if (newField.trim() !== '') { // only add a new field if the input is not empty
       setRequiredFields([...requiredFields, newField]);
       setResponses([...responses, '']);
@@ -179,7 +176,7 @@ function AskForm() {
     <div className="d-flex">
       <div className="column">
         <div className="column-header">
-          <h3>Write your one-sentence request</h3>
+            <h3>Write Request</h3>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <form onSubmit={handleSubmit} style={{ width: '85%' }}>
@@ -196,7 +193,7 @@ function AskForm() {
 
       <div className="column">
         <div className="column-header">
-          <h3>Answer the following questions</h3>
+          <h3>Answer Questions</h3>
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <div class="d-flex justify-content-center my-3">
@@ -210,7 +207,7 @@ function AskForm() {
 
       <div className="column">
         <div className="column-header">
-          <h3>Result</h3>
+          <h3>Get Result</h3>
         </div>
         <div class="card-body">
           <div class="d-flex justify-content-center my-3">
