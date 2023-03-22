@@ -177,7 +177,7 @@ function AskForm() {
     <div className="d-flex">
       <div className="column">
         <div className="column-header">
-          <h3>Write your one-sentence request</h3>
+add .          <h3>Write Request</h3>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <form onSubmit={handleSubmit} style={{ width: '85%' }}>
@@ -194,7 +194,7 @@ function AskForm() {
 
       <div className="column">
         <div className="column-header">
-          <h3>Answer the following questions</h3>
+          <h3>Answer Questions</h3>
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <div class="d-flex justify-content-center my-3">
@@ -208,7 +208,7 @@ function AskForm() {
 
       <div className="column">
         <div className="column-header">
-          <h3>Result</h3>
+          <h3>Get Result</h3>
         </div>
         <div class="card-body">
           <div class="d-flex justify-content-center my-3">
