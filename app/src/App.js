@@ -12,6 +12,7 @@ function App() {
     <div>
       <br/>
       <h1>Promptly</h1>
+      <h3>Best tool to help organize your chatGPT prompt </h3>
       <hr className="hr-style"/>
       <AskForm/>
     </div>
