@@ -35,6 +35,8 @@ function AskForm() {
       // Split the response from chatGPT by new line and trim the whitespace.
       // TODO: #2 This is a temporary solution. We may need to adjust the parsing method later. 
       const params = response.data?.answer.trim().split('\n') || [];
+      const additionalInformation = "Additional Information"
+      params.push(additionalInformation);
       setRequiredFields(params);
       setResponses(Array(params.length).fill(''));
       setError('');
@@ -124,11 +126,13 @@ function AskForm() {
                 {requiredFields.map((param, index) => (
                   <div key={index}>
                     <div style={{ display: 'flex', alignItems: ' center', flexDirection: 'row'}}>
-                      <FontAwesomeIcon
+                      {(index !== requiredFields.length - 1)? 
+                        <FontAwesomeIcon
                         icon={faTimesCircle}
                         onClick={() => handleDeleteField(index)}
                         className="delete-button"
                       />
+                      : null}
                       <label className="form-label">{param}</label>
                     </div>
                     <textarea
