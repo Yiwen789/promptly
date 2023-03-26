@@ -35,10 +35,12 @@ function AskForm() {
       // Split the response from chatGPT by new line and trim the whitespace.
       // TODO: #2 This is a temporary solution. We may need to adjust the parsing method later. 
       const params = response.data?.answer.trim().split('\n') || [];
+      const splitParams = params.map(str => str.split(/^\d+\.\s+/)[1]);
       const additionalInformation = "Additional Information"
-      params.push(additionalInformation);
-      setRequiredFields(params);
-      setResponses(Array(params.length).fill(''));
+      splitParams.push(additionalInformation);
+      console.log(splitParams);
+      setRequiredFields(splitParams);
+      setResponses(Array(splitParams.length).fill(''));
       setError('');
     } catch (error) {
       setError('Oops! Something went wrong. Please try again.');
