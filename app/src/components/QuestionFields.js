@@ -3,6 +3,15 @@ import API_URL from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
+const compileToJson = (keys, values) => {
+  const obj = {};
+  keys.reduce((acc, key, index) => {
+    // Add the current key-value pair to the object
+    obj[key] = values[index];
+    return acc;
+  }, {});
+  return JSON.stringify(obj);
+}
 
 function QuestionFields(props) {
   const { formState, setFormState } = props;
@@ -52,17 +61,6 @@ function QuestionFields(props) {
         showNewField: false});
     }
   };
-
-  const compileToJson = (keys, values, isRandomArr) => {
-    const obj = {};
-    keys.reduce((acc, key, index) => {
-      // Add the current key-value pair to the object
-      obj[key] = values[index];
-      return acc;
-    }, {});
-
-    return JSON.stringify(obj);
-  }
 
   if (formState.requiredFields.length > 0) {
     return (
