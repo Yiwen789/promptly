@@ -28,7 +28,6 @@ function AskForm() {
       <div className="vertical-line"></div>
 
       <AnswerColumn formState={formState} setFormState={setFormState}/>
-      
     </div>
   );
 }
