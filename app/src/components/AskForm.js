@@ -103,7 +103,7 @@ function AskForm() {
     return JSON.stringify(obj);
   }
 
-  function handleCopyClick() {
+  const handleCopyClick = () => {
     navigator.clipboard.writeText(formState.answer);
     setFormState({...formState, copied:true});
   }
