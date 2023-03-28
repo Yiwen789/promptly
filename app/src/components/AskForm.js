@@ -19,17 +19,6 @@ function AskForm() {
     copied: false,
   });
 
-  // const [request, setRequest] = useState('');
-  // const [requiredFields, setRequiredFields] = useState([]);
-  // const [newField, setNewField] = useState(''); // added new state variable
-  // const [responses, setResponses] = useState([]);
-  // const [answer, setAnswer] = useState('');
-  // const [questionsIsLoading, setQuestionsIsLoading] = useState(false);
-  // const [resIsLoading, setResIsLoading] = useState(false);
-  // const [error, setError] = useState('');
-  // const [showNewField, setShowNewField] = useState(false);
-  // const [copied, setCopied] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formState.request.trim()) {
