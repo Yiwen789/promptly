@@ -4,8 +4,7 @@ import RequestColumn from './RequestColumn';
 import QuestionColumn from './QuestionColumn';
 import AnswerColumn from './AnswerColumn';
 
-
-function AskForm() {
+function AskForm({ API_URL }) {
   const [formState, setFormState] = useState({
     request: '',
     requiredFields: [],
