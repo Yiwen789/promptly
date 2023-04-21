@@ -2,7 +2,20 @@ const express = require('express');
 const { Configuration, OpenAIApi, ChatCompletionRequestMessageRoleEnum } = require('openai');
 const cors = require('cors');
 const app = express();
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 
+// Set up session middleware
+app.use(session({
+  secret: 'my-secret',
+  resave: false,
+  saveUninitialized: false,
+}));
+
+// Set up Passport.js middleware
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json());
 app.use(cors());
 
@@ -72,6 +85,43 @@ app.post("/ask-res", async (req, res) => {
   } catch (error) {
     console.log(error.message);
   }
+});
+
+// Set up passport.js middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configure Google authentication strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: '/auth/google/callback',
+},
+function(accessToken, refreshToken, profile, cb) {
+  // Handle authentication success
+  cb(null, profile);
+}
+));
+
+// Serialize and deserialize user information
+passport.serializeUser(function(user, done) {
+done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+done(null, user);
+});
+
+// Define routes for Google authentication
+app.get('/auth/google',
+passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+passport.authenticate('google', { failureRedirect: '/login' }),
+function(req, res) {
+  // Successful authentication, redirect home.
+  res.redirect('/');
+  console.log("Success!")
 });
 
 app.listen(3001, () => {
