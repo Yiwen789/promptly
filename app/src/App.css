@@ -40,7 +40,15 @@
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin: 40px;
+  font-family: "Playfair Display";
+  font-weight: bold;
+}
+
+h3 {
+  text-align: center;
+  margin: 40px;
+  font-family: "Playfair Display";
 }
 
 .hr .container {
@@ -121,3 +129,13 @@ h1 {
   color: rgb(250, 72, 72);
 }
 
+
+.title-container {
+  width: 100%;
+  /* background-image: url('/home/banner.png'); */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right 10% bottom 0;
+  min-height: 730px;
+  position: relative;
+}
