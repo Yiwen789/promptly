@@ -4,6 +4,8 @@ import RequestColumn from './RequestColumn';
 import QuestionColumn from './QuestionColumn';
 import AnswerColumn from './AnswerColumn';
 
+import { Resizable } from 'react-resizable';
+
 
 function AskForm() {
   const [formState, setFormState] = useState({
@@ -19,9 +21,20 @@ function AskForm() {
     copied: false,
   });
 
+  const [dimensions, setDimensions] = useState({ 
+    width: 200, height: 200 
+  });
+
+  const handleResize = (event, { size }) => {
+    setDimensions({ width: size.width, height: size.height });
+  };
+
   return (
     <div className="d-flex">
+      <Resizable width={200} height={200} onResize={handleResize}>
       <RequestColumn formState={formState} setFormState={setFormState}/>
+      </Resizable>
+      
       <div className="vertical-line"></div>
 
       <QuestionColumn formState={formState} setFormState={setFormState}/>
